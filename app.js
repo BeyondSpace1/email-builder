@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
-const template = require('./models/template');
+const Template = require('./models/template');
 const app = express();
 
 // Middleware
@@ -61,8 +61,8 @@ app.post('/saveTemplate', upload.single('image'), async (req, res) => {
         }
 
         const imageUrl = req.file ? `/images/${req.file.filename}` : '';
-        const newTemplate = new template({ title, content, imageUrl });
-        await newTemplate.save();
+        const template = new Template({ title, content, imageUrl });
+        await template.save();
 
         res.json({
             status: 'success',
