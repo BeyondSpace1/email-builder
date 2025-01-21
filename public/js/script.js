@@ -8,6 +8,7 @@ function updateEditor() {
     const emailContent = emailEditor.querySelector('.email-content');
     const emailImage = emailEditor.querySelector('.email-image');
 
+    // Update the editor content with the new values
     emailTitle.textContent = title;
     emailContent.textContent = content;
 
@@ -17,6 +18,13 @@ function updateEditor() {
     } else {
         emailImage.style.display = 'none';
     }
+
+    // Apply text styles
+    const textColor = document.getElementById('text-color').value;
+    const textSize = document.getElementById('text-size').value;
+    const textAlignment = document.getElementById('text-alignment').value;
+
+    emailContent.className = `email-content ${textColor} ${textSize} ${textAlignment}`;
 }
 
 document.getElementById('email-title').addEventListener('input', updateEditor);
@@ -25,18 +33,8 @@ document.getElementById('email-content').addEventListener('input', updateEditor)
 document.getElementById('email-image').addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (file) {
-        if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
-            alert('Invalid file type. Only JPEG, PNG, and GIF are allowed.');
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert('File is too large. Maximum allowed size is 5MB.');
-            return;
-        }
-
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             imageURL = e.target.result;
             updateEditor();
         };
@@ -44,28 +42,19 @@ document.getElementById('email-image').addEventListener('change', (event) => {
     }
 });
 
-function saveTemplate() {
-    const title = document.getElementById('email-title').value;
-    const content = document.getElementById('email-content').value;
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
-    formData.append('image', document.getElementById('email-image').files[0]);
+document.getElementById('text-color').addEventListener('change', updateEditor);
+document.getElementById('text-size').addEventListener('change', updateEditor);
+document.getElementById('text-alignment').addEventListener('change', updateEditor);
 
-    fetch('/saveTemplate', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('Template saved successfully!');
-        } else {
-            alert(`Error: ${data.message}`);
-        }
-    })
-    .catch(error => {
-        console.error('Error occurred:', error);
-        alert('Failed to save template. Please try again.');
-    });
-}
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+    const html = document.querySelector('html');
+    if (html.getAttribute('data-theme') === 'light') {
+        html.setAttribute('data-theme', 'dark');
+        document.body.classList.replace('bg-gray-100', 'bg-gray-800');
+        document.body.classList.replace('text-black', 'text-white');
+    } else {
+        html.setAttribute('data-theme', 'light');
+        document.body.classList.replace('bg-gray-800', 'bg-gray-100');
+        document.body.classList.replace('text-white', 'text-black');
+    }
+});

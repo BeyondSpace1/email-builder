@@ -82,17 +82,6 @@ app.use((err, req, res, next) => {
     next(err);
 });
 
-// Add-ons: shadcnUi, dark-mode, and text modifications
-app.get('/add-ons', (req, res) => {
-    res.send({
-        features: {
-            ui: 'shadcnUi integration',
-            mode: 'dark-mode and liquid-like display',
-            text_modifications: 'Modify text color, size, and alignment independently',
-        },
-    });
-});
-
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
