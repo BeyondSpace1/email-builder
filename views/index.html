@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Builder</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <!-- Title and Content Inputs -->
+    <div class="container mx-auto">
+        <h2 class="text-xl font-bold mb-4">Email Template Editor</h2>
+        <div class="mb-4">
+            <label for="email-title" class="block text-sm font-medium text-gray-700">Email Title</label>
+            <input type="text" id="email-title" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Enter title">
+        </div>
+        <div class="mb-4">
+            <label for="email-content" class="block text-sm font-medium text-gray-700">Email Content</label>
+            <textarea id="email-content" rows="5" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Enter content"></textarea>
+        </div>
+        <div>
+            <label for="email-image" class="block text-sm font-medium text-gray-700">Upload Image</label>
+            <input type="file" id="email-image" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+        </div>
+        <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded" onclick="saveTemplate()">Save Template</button>
+    </div>
+
+    <!-- Real-time email editor -->
+    <div id="email-editor" class="mt-6 bg-white border p-6 rounded-md shadow-lg max-w-3xl mx-auto">
+        <div class="header">
+            <h1 class="email-title text-center text-2xl font-bold">Your Email Title</h1>
+        </div>
+        <div class="body">
+            <p class="email-content text-center text-lg">Your email content goes here.</p>
+            <img class="email-image mx-auto mt-4" src="" alt="Uploaded Image" style="display:none;">
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>
