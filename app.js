@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
-const Template = require('./models/template');
+const template = require('./models/template');
 const app = express();
 
 // Middleware
@@ -61,8 +61,8 @@ app.post('/saveTemplate', upload.single('image'), async (req, res) => {
         }
 
         const imageUrl = req.file ? `/images/${req.file.filename}` : '';
-        const template = new Template({ title, content, imageUrl });
-        await template.save();
+        const newTemplate = new template({ title, content, imageUrl });
+        await newTemplate.save();
 
         res.json({
             status: 'success',
@@ -80,6 +80,17 @@ app.use((err, req, res, next) => {
         return res.status(400).json({ status: 'error', message: err.message });
     }
     next(err);
+});
+
+// Add-ons: shadcnUi, dark-mode, and text modifications
+app.get('/add-ons', (req, res) => {
+    res.send({
+        features: {
+            ui: 'shadcnUi integration',
+            mode: 'dark-mode and liquid-like display',
+            text_modifications: 'Modify text color, size, and alignment independently',
+        },
+    });
 });
 
 // Start server
