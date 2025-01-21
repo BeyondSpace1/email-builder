@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const Template = require('./models/Template');
 const app = express();
 
@@ -10,26 +11,42 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
+// Ensure public/images directory exists
+const uploadDir = './public/images';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 // Setup multer for image uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './public/images');
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
+        cb(null, Date.now() + path.extname(file.originalname));
     },
 });
 
-const upload = multer({ storage });
+const upload = multer({ 
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.mimetype)) {
+            return cb(new Error('Invalid file type. Only JPEG, PNG, and GIF are allowed.'));
+        }
+        cb(null, true);
+    }
+});
 
 // MongoDB Connection
-const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/email_builder'; // Default to local DB
+const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/email_builder';
 mongoose.connect(dbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
 .then(() => console.log('MongoDB connected'))
-.catch((err) => console.log(err));
+.catch((err) => console.log('MongoDB connection error:', err));
 
 // Routes
 app.get('/', (req, res) => {
@@ -39,8 +56,11 @@ app.get('/', (req, res) => {
 app.post('/saveTemplate', upload.single('image'), async (req, res) => {
     try {
         const { title, content } = req.body;
-        const imageUrl = req.file ? `/images/${req.file.filename}` : '';
+        if (!title || !content) {
+            return res.status(400).json({ status: 'error', message: 'Title and content are required.' });
+        }
 
+        const imageUrl = req.file ? `/images/${req.file.filename}` : '';
         const template = new Template({ title, content, imageUrl });
         await template.save();
 
@@ -50,9 +70,16 @@ app.post('/saveTemplate', upload.single('image'), async (req, res) => {
             file: `/downloads/email_template_${Date.now()}.html`,
         });
     } catch (error) {
-        console.error(error);
+        console.error('Error saving template:', error.message);
         res.status(500).json({ status: 'error', message: 'Server error' });
     }
+});
+
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError || err.message.includes('Invalid file type')) {
+        return res.status(400).json({ status: 'error', message: err.message });
+    }
+    next(err);
 });
 
 // Start server
