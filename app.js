@@ -2,8 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-const Template = require('./models/Template');
+const Template = require('./models/template');
 const app = express();
 
 // Middleware
@@ -13,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Ensure public/images directory exists
 const uploadDir = './public/images';
+const fs = require('fs');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
